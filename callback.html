@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback</title>
+</head>
+<body>
+    <input type="text" name="url" id="url">
+    <button id="btn">Download</button>
+
+    <script>
+        // Callback
+        function firstCallback(url, callback) {
+        const upload = new XMLHttpRequest();
+        upload.open("GET", url, true);
+        upload.responseType = "blob";
+
+        upload.onload = function () {
+          if (upload.status === 200) {
+            callback(null, upload.response);
+          } else {
+            callback(new Error(`Request failed  ${upload.status}`));
+          }
+        };
+
+        upload.onerror = function () {
+          callback(new Error("Network error"));
+        };
+
+        upload.send();
+      }
+
+      const urlInput = document.getElementById("url");
+      const downloadBtn = document.getElementById("btn");
+
+      downloadBtn.addEventListener("click", () => {
+        firstCallback(urlInput.value, (error, blob) => {
+          if (error) {
+            console.error("Error getting data:", error);
+          } else {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = new Date().getTime();
+            link.click();
+          }
+        });
+      });
+
+    // async/await
+    // const urlInput = document.getElementById("url");
+    //   const downloadBtn = document.getElementById("btn");
+
+    //   downloadBtn.addEventListener("click", async () => {
+    //     const response = await fetch(urlInput.value);
+    //     const file = await response.blob();
+    //     const link = document.createElement("a");
+
+    //     link.href = URL.createObjectURL(file);
+    //     link.download = new Date().getTime();
+    //     link.click();
+    //   });
+
+    // Promises
+    // function firstPromise(url) {
+    //     return new Promise(function (resolve, reject) {
+    //       fetch(url)
+    //         .then(function (response) {
+    //           if (!response.ok) {
+    //             throw new Error(
+    //               `Request failed ${response.status}`
+    //             );
+    //           }
+    //           return response.blob();
+    //         })
+    //         .then(resolve)
+    //         .catch(reject);
+    //     });
+    //   }
+
+    //   const urlInput = document.getElementById("url");
+    //   const downloadBtn = document.getElementById("btn");
+
+    //   downloadBtn.addEventListener("click", function () {
+    //     firstPromise(urlInput.value)
+    //       .then(function (blob) {
+    //         const link = document.createElement("a");
+    //         link.href = URL.createObjectURL(blob);
+    //         link.download = new Date().getTime();
+    //         link.click();
+    //       })
+    //       .catch(function (error) {
+    //         console.error("Error getting data:", error);
+    //       });
+    //   });
+    </script>
+</body>
+</html>
